@@ -1,0 +1,3 @@
+local-mathjax.diff
+upstream_Use-database-in-source-directory-while-running-tests.patch
+upstream_Patch-47-respect-DESTDIR-when-installing-python-stuf.patch

@@ -1,0 +1,267 @@
+lensfun (0.3.2-6) unstable; urgency=medium
+
+  [ Debian Janitor ]
+  * Set upstream metadata fields: Bug-Database, Bug-Submit, Repository,
+    Repository-Browse.
+
+  [ Pino Toscano ]
+  * Bump the debhelper compatibility to 13:
+    - switch the debhelper-compat build dependency to 13
+  * Use /usr/share/dpkg/architecture.mk instead of manually querying for
+    $DEB_HOST_ARCH_CPU.
+  * Add Rules-Requires-Root: no.
+  * Bump Standards-Version to 4.5.1, no changes required.
+
+  [ Helmut Grohne ]
+  * Drop unused Build-Depends: libpng-dev as -DBUILD_LENSTOOL=ON is not
+    passed. (Closes: #981312)
+
+ -- Pino Toscano <pino@debian.org>  Sun, 07 Feb 2021 12:02:55 +0100
+
+lensfun (0.3.2-5) unstable; urgency=medium
+
+  * Switch Vcs-* fields to salsa.debian.org.
+  * Switch Homepage to https://lensfun.github.io/.
+  * Update watch file to point to github.com.
+  * Bump the debhelper compatibility to 12:
+    - switch the debhelper build dependency to debhelper-compat 12
+    - remove debian/compat
+    - drop the dh_makeshlibs override, as -V is done by default
+    - stop passing --list-missing to dh_missing, as it is done by default
+    - stop excluding examples from dh_compress, as it is done by default
+  * Remove empty line at the end of control.
+  * Add the configuration for the CI on salsa.
+  * Bump Standards-Version to 4.5.0, no changes required.
+
+ -- Pino Toscano <pino@debian.org>  Fri, 31 Jan 2020 11:39:30 +0100
+
+lensfun (0.3.2-4) unstable; urgency=medium
+
+  * Add the dh-python build dependency, now explicitly required.
+  * Bump Standards-Version to 4.1.4, no changes required.
+  * Bump the debhelper compatibility to 11:
+    - bump the debhelper build dependency to 11~
+    - bump compat to 11
+    - remove --parallel for dh, as now done by default
+  * Fix typo in copyright.
+  * Switch from dh_install to dh_missing for --list-missing.
+  * Remove trailing whitespaces in changelog.
+
+ -- Pino Toscano <pino@debian.org>  Sat, 21 Apr 2018 08:12:25 +0200
+
+lensfun (0.3.2-3) unstable; urgency=medium
+
+  * Upload to unstable (see #821190).
+  * Update Vcs-Browser field.
+  * Bump Standards-Version to 3.9.8, no changes required.
+  * Add myself to Uploaders.
+
+ -- Pino Toscano <pino@debian.org>  Sat, 16 Apr 2016 18:35:43 +0200
+
+lensfun (0.3.2-2) experimental; urgency=medium
+
+  * Team upload.
+  * Enable SSE and SSE2 only when building explicitly on amd64 CPUs, disabled
+    otherwise.
+
+ -- Pino Toscano <pino@debian.org>  Tue, 12 Jan 2016 18:41:59 +0100
+
+lensfun (0.3.2-1) experimental; urgency=medium
+
+  * Team upload.
+  * New upstream release (Closes: #771838) (LP: #1455216)
+  * Rename liblensfun0 to liblensfun1 according to the new upstream SONAME.
+  * Delete the build_docs.diff patch, it was not applied in previous versions
+    already.
+  * Rename liblensfun-data to liblensfun-data-v1, following upstream's
+    indications about the separate versioning of the lensfun database.
+  * Update .install files.
+  * Mark liblensfun1 as "Multi-Arch: same".
+  * Replace the python build dependency with python3, as it's what upstream
+    uses now.
+  * Add two new binary packages: liblensfun-bin (with utilities), and
+    python3-lensfun (Python 3 module).
+    - use the python3 dh addon to handle the python3 packaging
+  * Rename the DOCDIR parameter for cmake to CMAKE_INSTALL_DOCDIR, as upstream
+    uses GNUInstallDirs.cmake now.
+  * Rework the building of the documentation: since BUILD_DOC enables other
+    documentation than the API docs, we always need to enable it:
+    - move doxygen as proper build dependency
+    - always enable BUILD_DOC in cmake
+    - add the python3-docutils build dependency, needed for rst2man
+  * Use a locally installed mathjax instead of a remote version:
+    - point the doxygen configurations to the local path; patch
+      local-mathjax.diff
+    - add the libjs-mathjax dependency to liblensfun-doc
+  * Bump shlibs to >= 0.3.2.
+  * Stop passing --buildsystem=cmake to dh, as there is only the CMake
+    buildsystem upstream now.
+  * Tighten the -data dependency in the library package.
+  * Stop installing manual-main.txt in liblensfun-doc, as it's just one source
+    of the API docs.
+  * Install the documentation examples in liblensfun-dev, making sure to not
+    compress them.
+  * Backport upstream commit 3f74b78e4ee9f1d400ebbf2b9093a0f9c48c6307 to fix
+    the Database unit test without an already installed lensfun; patch
+    upstream_Use-database-in-source-directory-while-running-tests.patch.
+  * Backport upstream commit 9ec857bb403accc262a9b5a9c2921b5c064fc9c8 to fix
+    DESTDIR installation for the python stuff; patch
+    upstream_Patch-47-respect-DESTDIR-when-installing-python-stuf.patch
+  * Pass -DBUILD_TESTS=ON to cmake to enable the unit tests, now that all of
+    them should work.
+
+ -- Pino Toscano <pino@debian.org>  Sun, 10 Jan 2016 16:06:26 +0100
+
+lensfun (0.2.8-3) unstable; urgency=medium
+
+  * Team upload.
+  * Set "Multi-Arch: foreign" for liblensfun-data, to help in multiarch
+    installations. (Closes: #785315)
+  * Bump Standards-Version to 3.9.6, no changes required.
+  * Update watch file (add .gz extension).
+  * Pass --list-missing to dh_install, to spot potentially uninstalled files.
+
+ -- Pino Toscano <pino@debian.org>  Thu, 07 Jan 2016 17:54:47 +0100
+
+lensfun (0.2.8-2) unstable; urgency=medium
+
+  * Team upload.
+  * The project moved from Berlios to Sourceforce, so:
+    - update Homepage to http://lensfun.sourceforge.net
+    - update watch file to look on sf.net
+  * Add Vcs-* headers.
+  * Simplify/improve/sort .install files.
+  * Do not build the documentation on arch-only builds:
+    - move the doxygen build dependency to Build-Depends-Indep
+    - explicitly disable the documentation build (i.e. pass -DBUILD_DOC=OFF
+      to cmake) when not producing -doc packages
+  * Add the pkg-config build dependency.
+  * Bump the priority to optional, since it is used by other "optional"
+    sources.
+
+ -- Pino Toscano <pino@debian.org>  Mon, 08 Sep 2014 09:01:51 +0200
+
+lensfun (0.2.8-1) unstable; urgency=low
+
+  * New upstream release
+  * Add --parallel
+  * Add -DDOCDIR="/usr/share/doc/liblensfun-doc/html"
+  * Add +docs/adobe-lens-profile.txt
+  * Bump shlibs - dh_makeshlibs -V 'liblensfun0 (>= 0.2.8)'
+  * Bump Standards-Version: 3.9.5 - no further changes
+
+ -- Mark Purcell <msp@debian.org>  Sat, 09 Nov 2013 16:32:20 +1100
+
+lensfun (0.2.7-3) unstable; urgency=low
+
+  [Andreas Metzler]
+  * Bump shlibs. Closes: #722406
+
+ -- Mark Purcell <msp@debian.org>  Sun, 12 May 2013 17:27:17 +1000
+
+lensfun (0.2.7-2) unstable; urgency=low
+
+  * Upload to unstable
+
+ -- Mark Purcell <msp@debian.org>  Sun, 12 May 2013 10:17:02 +1000
+
+lensfun (0.2.7-1) experimental; urgency=low
+
+  * New upstream release
+    - Fixes "new upstream version" (Closes: #679113)
+    - Fixes "FTBFS with libpng 1.5" (Closes: #648130)
+  * Update debian/watch - Thanks Bart
+  * Fixed "Build-Depends on libpng-dev" (Closes: #662391)
+  * Switch to cmake - Thanks yofel@kubuntu.org
+  * debian/compat -> 9
+
+ -- Mark Purcell <msp@debian.org>  Sat, 09 Mar 2013 14:29:47 +1100
+
+lensfun (0.2.7-0ubuntu1) raring; urgency=low
+
+  * New upstream release (LP: #1084730)
+  * Switch to new cmake based buildsystem as the old one doesn't create
+    a properly versioned library anymore and is deprecated
+    - Add build-dep on cmake
+    - Drop buil-dep on autotools-dev
+  * Port package from cdbs to dh7 style rules
+    - Build-Depend on debhelper >= 7.0.50~
+    - Drop build-dep on cdbs
+    - rewrite rules to use dh instead of cdbs
+    into the right path again
+  * Add ubuntu_build_docs.diff so the documentation is built and installed
+  * Update liblensfun-doc.install as the documentation is now installed into
+    the right location right away
+  * Switch to source format 3.0 (quilt) for quilt support
+
+ -- Philip Muškovac <yofel@kubuntu.org>  Mon, 25 Feb 2013 20:49:11 +0100
+
+lensfun (0.2.5-2) unstable; urgency=low
+
+  * Drop symbol support (Closes: #589048)
+  * Fix "liblensfun packages seem to miss some documentation"
+    missing dir added to liblensfun-doc.install (Closes: #617547)
+
+ -- Mark Purcell <msp@debian.org>  Sun, 22 Jan 2012 13:40:44 +1100
+
+lensfun (0.2.5-1) experimental; urgency=low
+
+  * New upstream release (Closes: #576230)
+    - Upload to experimental whilst we investigate symbols
+  * disable --vectorization= while we workout howto cross platform
+
+ -- Mark Purcell <msp@debian.org>  Wed, 14 Jul 2010 21:01:12 +1000
+
+lensfun (0.2.4-1) unstable; urgency=low
+
+  * New upstream release
+
+  [ Didier Raboud ]
+  * In debian/control, write a new common description for the binary packages
+    (Closes: #522168)
+
+  [ Stefan Potyra ]
+  * Add 10-makedep-fix-ftbfs patch to fix FTBFS.
+  * Add 20-enum-sentinel patch to have g++-4.4 not remove the otherwise
+    unreachable code handling out-of-bounds enum values via the
+    c-wrapper functions. LP: #433368.
+
+  [ Pascal de Bruijn ]
+  * Drop all previous lensfun database patches.
+  * Add 90-lensfun-db-update-rel-to-svn65 patch, to update the lensfun
+    database to revision 65 of lensfun svn.
+  * Add 91-lensfun-db-update-svn65-to-pmjdebruijn patch, to update the
+    lensfun database from revision 65 to pmjdebruijn's local tree.
+
+  [ Mark Purcell ]
+  * Update debian/watch
+  * Drop debian/patches & dpatch as included upstream 0.2.4
+
+ -- Mark Purcell <msp@debian.org>  Mon, 26 Oct 2009 08:12:51 +1100
+
+lensfun (0.2.3-2) unstable; urgency=low
+
+  [ Luka Renko ]
+  * rules: add --libdir=/usr/lib to ./configure for amd64 libraries.
+    (Closes: #516657)
+  * Update debian/liblensfun0.symbols to match all symbols.
+
+  [ Pascal de Bruijn ]
+  * Added patches:
+    - 01-lensfun-db-cameras-generic (APS-H, FourThirds)
+    - 02-lensfun-db-cameras-canon (5DmkII, 50D, 30D)
+    - 03-lensfun-db-cameras-nikon (D40, D40X, D60, D80, D90, D700, D3, D3X)
+    - 04-lensfun-db-cameras-pentax (K100D, K200D, K10D, K20D)
+    - 05-lensfun-db-cameras-samsung (GX20)
+  * Split up the data package into a data and doc package.
+
+  [ Mark Purcell ]
+  * Update Maintainer: Debian KDE Extras Team.
+
+ -- Debian KDE Extras Team <pkg-kde-extras@lists.alioth.debian.org>  Thu, 19 Mar 2009 23:26:51 +0100
+
+lensfun (0.2.3-1) unstable; urgency=low
+
+  * Initial release (Closes: #509242)
+
+ -- Mark Purcell <msp@debian.org>  Wed, 07 Jan 2009 09:47:45 +1100

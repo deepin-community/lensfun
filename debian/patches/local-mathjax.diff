@@ -1,0 +1,31 @@
+Author: Pino Toscano <pino@debian.org>
+Description: Use a locally installed mathjax, instead of a remote version
+Last-Update: 2016-01-09
+Forwarded: not-needed
+
+diff --git a/docs/doxyfile.in.cmake b/docs/doxyfile.in.cmake
+index 235484b..9dd8550 100644
+--- a/docs/doxyfile.in.cmake
++++ b/docs/doxyfile.in.cmake
+@@ -1208,7 +1208,7 @@ MATHJAX_FORMAT         = HTML-CSS
+ # However, it is strongly recommended to install a local
+ # copy of MathJax from http://www.mathjax.org before deployment.
+ 
+-MATHJAX_RELPATH        = http://lensfun.sourceforge.net/mathjax
++MATHJAX_RELPATH        = /usr/share/javascript/mathjax
+ 
+ # The MATHJAX_EXTENSIONS tag can be used to specify one or MathJax extension
+ # names that should be enabled during MathJax rendering.
+diff --git a/docs/manual-doc.conf b/docs/manual-doc.conf
+index 50bed35..3b1269d 100644
+--- a/docs/manual-doc.conf
++++ b/docs/manual-doc.conf
+@@ -1208,7 +1208,7 @@ MATHJAX_FORMAT         = HTML-CSS
+ # However, it is strongly recommended to install a local
+ # copy of MathJax from http://www.mathjax.org before deployment.
+ 
+-MATHJAX_RELPATH        = http://lensfun.sourceforge.net/mathjax
++MATHJAX_RELPATH        = /usr/share/javascript/mathjax
+ 
+ # The MATHJAX_EXTENSIONS tag can be used to specify one or MathJax extension
+ # names that should be enabled during MathJax rendering.

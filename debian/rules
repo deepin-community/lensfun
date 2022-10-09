@@ -1,0 +1,19 @@
+#!/usr/bin/make -f
+
+include /usr/share/dpkg/architecture.mk
+
+ifeq ($(DEB_HOST_ARCH_CPU),amd64)
+  EXTRA_CMAKE_ARGS += -DBUILD_FOR_SSE=ON -DBUILD_FOR_SSE2=ON
+else
+  EXTRA_CMAKE_ARGS += -DBUILD_FOR_SSE=OFF -DBUILD_FOR_SSE2=OFF
+endif
+
+%:
+	dh $@ --with=python3
+
+override_dh_auto_configure:
+	dh_auto_configure -- -DBUILD_DOC=ON -DCMAKE_INSTALL_DOCDIR="/usr/share/doc/liblensfun-doc/html" -DBUILD_TESTS=ON $(EXTRA_CMAKE_ARGS)
+
+override_dh_auto_clean:
+	find -name "*.pyc" -exec rm -f '{}' \;
+	dh_auto_clean

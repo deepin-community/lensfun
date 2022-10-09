@@ -1,0 +1,154 @@
+Source: lensfun
+Priority: optional
+Maintainer: Debian KDE Extras Team <pkg-kde-extras@lists.alioth.debian.org>
+Uploaders: Mark Purcell <msp@debian.org>,
+ Pino Toscano <pino@debian.org>
+Build-Depends: debhelper-compat (= 13), cmake, pkg-config, python3, libglib2.0-dev,
+ dh-python,
+ doxygen,
+ python3-docutils,
+Standards-Version: 4.5.1
+Section: libs
+Rules-Requires-Root: no
+Homepage: https://lensfun.github.io/
+Vcs-Browser: https://salsa.debian.org/qt-kde-team/3rdparty/lensfun
+Vcs-Git: https://salsa.debian.org/qt-kde-team/3rdparty/lensfun.git
+
+Package: liblensfun-dev
+Section: libdevel
+Architecture: any
+Depends: liblensfun1 (= ${binary:Version}), ${misc:Depends}
+Description: Lens Correction library - Development files
+ Lensfun is an opensource database of photographic lenses and their
+ characteristics. It contains three kinds of objects:
+  * mounts
+  * cameras
+  * lenses
+ .
+ It is used in various photo-related software in which it allows the
+ correction of various artifacts:
+  * distortion
+  * transveral (also known as lateral) chromatic aberrations
+  * vignetting
+  * colour contribution of the lens (correcting said "yellowish" or "blueish"
+    images)
+ .
+ It provides a way to read and search for specific things in the database.
+ .
+ This package contains the development files.
+
+Package: liblensfun1
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends},
+ liblensfun-data-v1 (>= ${source:Version})
+Multi-Arch: same
+Description: Lens Correction library - Runtime files
+ Lensfun is an opensource database of photographic lenses and their
+ characteristics. It contains three kinds of objects:
+  * mounts
+  * cameras
+  * lenses
+ .
+ It is used in various photo-related software in which it allows the
+ correction of various artifacts:
+  * distortion
+  * transveral (also known as lateral) chromatic aberrations
+  * vignetting
+  * colour contribution of the lens (correcting said "yellowish" or "blueish"
+    images)
+ .
+ It provides a way to read and search for specific things in the database.
+ .
+ This package contains the runtime files to access the library.
+
+Package: liblensfun-data-v1
+Architecture: all
+Depends: ${misc:Depends}
+Multi-Arch: foreign
+Description: Lens Correction library - Data
+ Lensfun is an opensource database of photographic lenses and their
+ characteristics. It contains three kinds of objects:
+  * mounts
+  * cameras
+  * lenses
+ .
+ It is used in various photo-related software in which it allows the
+ correction of various artifacts:
+  * distortion
+  * transveral (also known as lateral) chromatic aberrations
+  * vignetting
+  * colour contribution of the lens (correcting said "yellowish" or "blueish"
+    images)
+ .
+ It provides a way to read and search for specific things in the database.
+ .
+ This package contains the data collection.
+
+Package: liblensfun-doc
+Section: doc
+Architecture: all
+Depends: ${misc:Depends}, libjs-mathjax
+Description: Lens Correction library - Documentation
+ Lensfun is an opensource database of photographic lenses and their
+ characteristics. It contains three kinds of objects:
+  * mounts
+  * cameras
+  * lenses
+ .
+ It is used in various photo-related software in which it allows the
+ correction of various artifacts:
+  * distortion
+  * transveral (also known as lateral) chromatic aberrations
+  * vignetting
+  * colour contribution of the lens (correcting said "yellowish" or "blueish"
+    images)
+ .
+ It provides a way to read and search for specific things in the database.
+ .
+ This package contains the documentation.
+
+Package: liblensfun-bin
+Section: utils
+Architecture: any
+Depends: python3, python3-lensfun (= ${binary:Version}), ${misc:Depends}
+Description: Lens Correction library - Utilities
+ Lensfun is an opensource database of photographic lenses and their
+ characteristics. It contains three kinds of objects:
+  * mounts
+  * cameras
+  * lenses
+ .
+ It is used in various photo-related software in which it allows the
+ correction of various artifacts:
+  * distortion
+  * transveral (also known as lateral) chromatic aberrations
+  * vignetting
+  * colour contribution of the lens (correcting said "yellowish" or "blueish"
+    images)
+ .
+ It provides a way to read and search for specific things in the database.
+ .
+ This package contains the utilities.
+
+Package: python3-lensfun
+Section: python
+Architecture: any
+Depends: liblensfun1 (= ${binary:Version}), ${misc:Depends}, ${python3:Depends}
+Description: Lens Correction library - Python3 module
+ Lensfun is an opensource database of photographic lenses and their
+ characteristics. It contains three kinds of objects:
+  * mounts
+  * cameras
+  * lenses
+ .
+ It is used in various photo-related software in which it allows the
+ correction of various artifacts:
+  * distortion
+  * transveral (also known as lateral) chromatic aberrations
+  * vignetting
+  * colour contribution of the lens (correcting said "yellowish" or "blueish"
+    images)
+ .
+ It provides a way to read and search for specific things in the database.
+ .
+ This package contains the Python3 'lensfun' module.
