@@ -123,7 +123,7 @@ float lfModifier::GetRealFocalLength (const lfLens *lens, float focal)
 
             default:
                 // This should never happen
-                return NAN;
+                result = NAN;
         }
     }
     /* It may be surprising that get_hugin_focal_correction is applied even if
@@ -206,9 +206,11 @@ lfModifier::lfModifier (const lfLens *lens, float crop, int width, int height)
     ColorCallbacks = g_ptr_array_new ();
     CoordCallbacks = g_ptr_array_new ();
 
-    // Avoid divide overflows on singular cases
-    Width = (width >= 2 ? width : 2);
-    Height = (height >= 2 ? height : 2);
+    // Avoid divide overflows on singular cases.  The "- 1" is due to the fact
+    // that `Width` and `Height` are measured at the pixel centres (they are
+    // actually transformed) instead at their outer rims.
+    Width = (width >= 2 ? width - 1 : 1);
+    Height = (height >= 2 ? height - 1 : 1);
 
     // Image "size"
     float size = float ((Width < Height) ? Width : Height);
@@ -232,14 +234,14 @@ lfModifier::lfModifier (const lfLens *lens, float crop, int width, int height)
     // In NormalizedInMillimeters, we un-do all factors of
     // coordinate_correction that refer to the calibration sensor because
     // NormalizedInMillimeters is supposed to transform to image coordinates.
-    NormalizedInMillimeters = sqrt(36.0*36.0 + 24.0*24.0) / 2.0 /
+    NormalizedInMillimeters = sqrt (36.0*36.0 + 24.0*24.0) / 2.0 /
         AspectRatioCorrection / calibration_cropfactor;
 
     // The scale to transform {-size/2 .. 0 .. size/2-1} to {-1 .. 0 .. +1}
-    NormScale = 2.0 / (size - 1) * coordinate_correction;
+    NormScale = 2.0 / size * coordinate_correction;
 
     // The scale to transform {-1 .. 0 .. +1} to {-size/2 .. 0 .. size/2-1}
-    NormUnScale = (size - 1) * 0.5 / coordinate_correction;
+    NormUnScale = size * 0.5 / coordinate_correction;
 
     // Geometric lens center in normalized coordinates
     CenterX = (Width / size + (lens ? lens->CenterX : 0.0)) * coordinate_correction;
@@ -300,7 +302,7 @@ void lfModifier::AddCallback (void *arr, lfCallbackData *d,
 lfModifier *lf_modifier_new (
     const lfLens *lens, float crop, int width, int height)
 {
-    return lfModifier::Create (lens, crop, width, height);
+    return new lfModifier (lens, crop, width, height);
 }
 
 void lf_modifier_destroy (lfModifier *modifier)

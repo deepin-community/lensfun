@@ -1,5 +1,5 @@
-# require at least cmake 2.8
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8 FATAL_ERROR )
+# require at least cmake 2.8.12
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12 FATAL_ERROR )
 
 # path for helper modules
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_SOURCE_DIR}/cmake/modules")
@@ -8,10 +8,20 @@ GET_FILENAME_COMPONENT(SOURCE_BASE_DIR ${CMAKE_SOURCE_DIR} PATH CACHE)
 #  global setup
 project(lensfun C CXX)
 
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+IF (MSVC)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+ELSE()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wformat-security")
+ENDIF()
+
 # version
 SET(VERSION_MAJOR 0)
 SET(VERSION_MINOR 3)
-SET(VERSION_MICRO 2)
+SET(VERSION_MICRO 4)
 SET(VERSION_BUGFIX 0)
 SET(VERSION_API 1)
 # This is the version of the *shipped* database, which is not necessarily the
@@ -31,13 +41,21 @@ IF(NOT HAVE_REGEX_H)
   INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/libs/regex)
 ENDIF()
 
+IF(CMAKE_SYSTEM_PROCESSOR MATCHES "[XxIi][0-9]?86|[Aa][Mm][Dd]64")
+  SET(X86_ON ON)
+else()
+  SET(X86_ON OFF)
+ENDIF()
+
 # options controlling the build process
 OPTION(BUILD_STATIC "Build static library" OFF)
+OPTION(BUILD_WITH_MSVC_STATIC_RUNTIME "Build using static MSVC runtime" OFF)
 OPTION(BUILD_TESTS "Build test suite" OFF)
 OPTION(BUILD_LENSTOOL "Build the lenstool (requires libpng)" OFF)
-OPTION(BUILD_FOR_SSE "Build with support for SSE" ON)
-OPTION(BUILD_FOR_SSE2 "Build with support for SSE2" ON)
+OPTION(BUILD_FOR_SSE "Build with support for SSE" ${X86_ON})
+OPTION(BUILD_FOR_SSE2 "Build with support for SSE2" ${X86_ON})
 OPTION(BUILD_DOC "Build documentation with doxygen" OFF)
+OPTION(INSTALL_PYTHON_MODULE "Install Python module for the helper scripts" ON)
 OPTION(INSTALL_HELPER_SCRIPTS "Install various helper scripts" ON)
 
 IF(NOT CMAKE_BUILD_TYPE)
@@ -47,10 +65,21 @@ IF(NOT CMAKE_BUILD_TYPE)
   )
 ENDIF()
 
-# set local install prefix on windows
-IF(WIN32 AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)  
-  SET(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/install" CACHE PATH "Install prefix for Lensfun" FORCE)    
+# place all .exe and .dll files in same folder to avoid issues with tests
+IF(WIN32)
+  SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 ENDIF()
+
+# set local install prefix on windows
+IF(WIN32 AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+  SET(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/install" CACHE PATH "Install prefix for Lensfun" FORCE)
+ENDIF()
+
+# overwrite some folders before GNUInstallDirs is loaded
+IF (WIN32 AND NOT DEFINED CMAKE_INSTALL_DATAROOTDIR)
+    SET(CMAKE_INSTALL_DATAROOTDIR "$ENV{ALLUSERSPROFILE}" CACHE PATH "read-only architecture-independent data root (share)")
+ENDIF()
+
 # get standard GNU install directories for the current platform
 INCLUDE(GNUInstallDirs)
 IF(NOT DEFINED CMAKE_INSTALL_DATAROOTDIR)
@@ -62,14 +91,14 @@ ENDIF()
 
 IF(BUILD_FOR_SSE)
   SET(VECTORIZATION_SSE 1)
-  IF(CMAKE_COMPILER_IS_GNUCXX)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse")
+  IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    SET(VECTORIZATION_SSE_FLAGS "-msse")
   ENDIF()
 ENDIF()
 IF(BUILD_FOR_SSE2)
   SET(VECTORIZATION_SSE2 1)
-  IF(CMAKE_COMPILER_IS_GNUCXX)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse2")
+  IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    SET(VECTORIZATION_SSE2_FLAGS "-msse2")
   ENDIF()
 ENDIF()
 
@@ -85,12 +114,19 @@ IF(WIN32)
   ENDIF()
 ENDIF()
 
-# find dependencies
-# NOTE: must be one of the macros listed in https://developer.gnome.org/glib/stable/glib-Version-Information.html
-SET(LENSFUN_GLIB_REQUIREMENT_MACRO "GLIB_VERSION_2_40")
-FIND_PACKAGE(GLIB2 REQUIRED 2.40)
+
+IF (BUILD_TESTS)
+  # automatic tests need at least glib version 2.40
+  # NOTE: must be one of the macros listed in https://developer.gnome.org/glib/stable/glib-Version-Information.html
+  SET(LENSFUN_GLIB_REQUIREMENT_MACRO "GLIB_VERSION_2_40")
+  FIND_PACKAGE(GLIB2 REQUIRED)
+ELSE()
+  SET(LENSFUN_GLIB_REQUIREMENT_MACRO "GLIB_VERSION_2_26")
+  FIND_PACKAGE(GLIB2 REQUIRED)
+ENDIF()
 
 INCLUDE_DIRECTORIES(SYSTEM ${GLIB2_INCLUDE_DIRS})
+LINK_DIRECTORIES(${GLIB2_LIBRARY_DIRS})
 
 
 IF(BUILD_STATIC)
@@ -100,10 +136,9 @@ ENDIF()
 
 # some windows and MSVC specific settings
 IF(WIN32)
-  SET(PLATFORM_WINDOWS 1)  
-  
+
   IF (MSVC)
-    IF(BUILD_STATIC)
+    IF(BUILD_WITH_MSVC_STATIC_RUNTIME)
       # compile everything for the static C runtime
       FOREACH(TYPE C CXX)
         # makefiles use blank configuration
@@ -129,6 +164,7 @@ IF(WIN32)
   ENDIF(MSVC)
 ENDIF(WIN32)
 
+
 # create config.h file
 CONFIGURE_FILE(include/lensfun/config.h.in.cmake ${CMAKE_BINARY_DIR}/config.h)
 # create lensfun.h file
@@ -144,6 +180,9 @@ IF(BUILD_TESTS)
 ENDIF()
 
 # apps subdir
+IF(BUILD_LENSTOOL)
+    FIND_PACKAGE(PNG REQUIRED)
+ENDIF()
 ADD_SUBDIRECTORY(apps)
 
 # install include files
@@ -154,8 +193,12 @@ ENDIF()
 
 # install db files
 FILE(GLOB DATABASE_FILES data/db/*.xml)
+
 INSTALL(FILES ${DATABASE_FILES} DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/lensfun/version_${LENSFUN_DB_VERSION})
 INSTALL(FILES data/db/timestamp.txt DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/lensfun/version_${LENSFUN_DB_VERSION})
+
+FILE(GLOB DATABASE_DTD data/db/*.dtd data/db/*.xsd)
+INSTALL(FILES ${DATABASE_DTD} DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/lensfun/version_${LENSFUN_DB_VERSION})
 
 # build documentation
 IF(BUILD_DOC)
@@ -163,8 +206,8 @@ IF(BUILD_DOC)
 ENDIF()
 
 IF(WIN32 AND NOT BUILD_STATIC)
-  FIND_FILE(GLIB2_DLL 
-            NAMES glib-2.dll glib-2-vs9.dll
+  FIND_FILE(GLIB2_DLL
+            NAMES glib-2.0-0.dll glib-2.dll glib-2-vs9.dll
             PATHS "${GLIB2_BASE_DIR}/bin"
             NO_SYSTEM_ENVIRONMENT_PATH)
   INSTALL(FILES ${GLIB2_DLL} DESTINATION ${CMAKE_INSTALL_BINDIR})
@@ -193,11 +236,11 @@ MESSAGE(STATUS "GLIB2 library: ${GLIB2_LIBRARIES}")
 IF(GLIB2_DLL)
 MESSAGE(STATUS "GLIB2 DLL: ${GLIB2_DLL}")
 ENDIF()
-IF(BUILD_APPS)
-MESSAGE(STATUS "libpng include dir: ${PNG_INCLUDE_DIR}")
-MESSAGE(STATUS "libpng lib: ${PNG_LIBRARY}")
-MESSAGE(STATUS "zlib include dir: ${ZLIB_INCLUDE_DIR}")
-MESSAGE(STATUS "zlib lib: ${ZLIB_LIBRARY}")
+IF(BUILD_LENSTOOL)
+MESSAGE(STATUS "libpng include dir: ${PNG_INCLUDE_DIRS}")
+MESSAGE(STATUS "libpng lib: ${PNG_LIBRARIES}")
+MESSAGE(STATUS "zlib include dir: ${ZLIB_INCLUDE_DIRS}")
+MESSAGE(STATUS "zlib lib: ${ZLIB_LIBRARIES}")
 ENDIF()
 
 # Package

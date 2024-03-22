@@ -97,13 +97,12 @@ lfError lfDatabase::Load ()
 
 #ifndef PLATFORM_WINDOWS
     gchar *main_dirname = g_build_filename (CONF_DATADIR, DATABASE_SUBDIR, NULL);
-    const gchar *system_updates_dirname = g_build_filename ("/var/lib/lensfun-updates", DATABASE_SUBDIR, NULL);
 #else
     /* windows based OS */
     extern gchar *_lf_get_database_dir ();
     gchar *main_dirname = _lf_get_database_dir ();
-    const gchar *system_updates_dirname = "C:\\to\\be\\defined\\lensfun-updates";
 #endif
+    const gchar *system_updates_dirname = g_build_filename (SYSTEM_DB_UPDATE_PATH, DATABASE_SUBDIR, NULL);
     const int timestamp_main =
         _lf_read_database_timestamp (main_dirname);
     const int timestamp_system_updates =
@@ -207,10 +206,17 @@ static void _xml_start_element (GMarkupParseContext *context,
                 version = atoi (attribute_values [i]);
             else
                 goto bad_attr;
+        if (version < LF_MIN_DATABASE_VERSION)
+        {
+            g_set_error (error, G_MARKUP_ERROR, G_MARKUP_ERROR_INVALID_CONTENT,
+                         "Database version is %d, but oldest supported is only %d!\n",
+                         version, LF_MIN_DATABASE_VERSION);
+            return;
+        }
         if (version > LF_MAX_DATABASE_VERSION)
         {
             g_set_error (error, G_MARKUP_ERROR, G_MARKUP_ERROR_INVALID_CONTENT,
-                         "Database version is %d, but supported is only %d!\n",
+                         "Database version is %d, but newest supported is only %d!\n",
                          version, LF_MAX_DATABASE_VERSION);
             return;
         }
@@ -1341,7 +1347,7 @@ void lfDatabase::AddLens (lfLens *lens)
 
 lfDatabase *lf_db_new ()
 {
-    return lfDatabase::Create ();
+    return new lfDatabase ();
 }
 
 void lf_db_destroy (lfDatabase *db)
@@ -1352,6 +1358,11 @@ void lf_db_destroy (lfDatabase *db)
 lfError lf_db_load (lfDatabase *db)
 {
     return db->Load ();
+}
+
+cbool lf_db_load_directory (lfDatabase *db, const char *dirname)
+{
+    return db->LoadDirectory (dirname);
 }
 
 lfError lf_db_load_file (lfDatabase *db, const char *filename)

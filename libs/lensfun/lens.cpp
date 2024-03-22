@@ -12,6 +12,7 @@
 #include <string.h>
 #include <locale.h>
 #include <math.h>
+#include "windows/mathconstants.h"
 #include <algorithm>
 
 static struct
@@ -128,6 +129,52 @@ lfLens::~lfLens ()
     _lf_list_free ((void **)CalibRealFocal);
     if (!--_lf_lens_regex_refs)
         _lf_free_lens_regex ();
+}
+
+lfLens::lfLens (const lfLens &other)
+{
+    Maker = lf_mlstr_dup (other.Maker);
+    Model = lf_mlstr_dup (other.Model);
+    MinFocal = other.MinFocal;
+    MaxFocal = other.MaxFocal;
+    MinAperture = other.MinAperture;
+    MaxAperture = other.MaxAperture;
+
+    Mounts = NULL;
+    if (other.Mounts)
+        for (int i = 0; other.Mounts [i]; i++)
+            AddMount (other.Mounts [i]);
+
+    CenterX = other.CenterX;
+    CenterY = other.CenterY;
+    CropFactor = other.CropFactor;
+    AspectRatio = other.AspectRatio;
+    Type = other.Type;
+
+    CalibDistortion = NULL;
+    if (other.CalibDistortion)
+        for (int i = 0; other.CalibDistortion [i]; i++)
+            AddCalibDistortion (other.CalibDistortion [i]);
+    CalibTCA = NULL;
+    if (other.CalibTCA)
+        for (int i = 0; other.CalibTCA [i]; i++)
+            AddCalibTCA (other.CalibTCA [i]);
+    CalibVignetting = NULL;
+    if (other.CalibVignetting)
+        for (int i = 0; other.CalibVignetting [i]; i++)
+            AddCalibVignetting (other.CalibVignetting [i]);
+    CalibCrop = NULL;
+    if (other.CalibCrop)
+        for (int i = 0; other.CalibCrop [i]; i++)
+            AddCalibCrop (other.CalibCrop [i]);
+    CalibFov = NULL;
+    if (other.CalibFov)
+        for (int i = 0; other.CalibFov [i]; i++)
+            AddCalibFov (other.CalibFov [i]);
+    CalibRealFocal = NULL;
+    if (other.CalibRealFocal)
+        for (int i = 0; other.CalibRealFocal [i]; i++)
+            AddCalibRealFocal (other.CalibRealFocal [i]);
 }
 
 lfLens &lfLens::operator = (const lfLens &other)
@@ -1392,7 +1439,7 @@ int _lf_lens_compare_score (const lfLens *pattern, const lfLens *match,
                     if (!_lf_strcmp (compat_mounts [i], match->Mounts [j]))
                     {
                         matching_mount_found = true;
-                        score += 5;
+                        score += 9;
                         goto exit_mount_search;
                     }
 

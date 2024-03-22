@@ -1,3 +1,38 @@
+lensfun (0.3.4-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Update standards version to 4.6.2, no changes needed.
+  * Update the build dependencies according to the upstream build system:
+    - bump cmake to 2.8.12
+    - add python3-setuptools
+  * Fix the setuptools-based installation of the Python module:
+    - export DEB_PYTHON_INSTALL_LAYOUT=deb so that the Python bits are installed
+      in the expected way for Debian builds (see #1041633)
+    - tweak the arguments for 'setup.py install'; patch python-setuptools.diff
+  * Remove inactive Uploaders.
+  * Update lintian overrides.
+  * Fix the handling of min/max float limits for comparisons, fixing the lens
+    search on certain architectures (e.g. i386); patch fix-float.diff.
+
+ -- Pino Toscano <pino@debian.org>  Sat, 12 Aug 2023 08:02:34 +0200
+
+lensfun (0.3.3-1) unstable; urgency=medium
+
+  * New upstream release. (Closes: #1007720)
+  * Update standards version to 4.6.0, no changes needed.
+  * Sort install files.
+  * Use execute_before_dh_auto_clean to avoid invoking dh_auto_clean manually.
+  * Update the patches:
+    - upstream_Use-database-in-source-directory-while-running-tests.patch:
+      drop, backported from upstream
+    - upstream_Patch-47-respect-DESTDIR-when-installing-python-stuf.patch:
+      drop, backported from upstream
+  * Change the python3 build dependency to python3:any, as Python is needed
+    only as build tool.
+  * Drop the "uupdate" step from the watch file.
+
+ -- Pino Toscano <pino@debian.org>  Tue, 15 Mar 2022 22:03:42 +0100
+
 lensfun (0.3.2-6) unstable; urgency=medium
 
   [ Debian Janitor ]
