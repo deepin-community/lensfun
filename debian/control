@@ -1,13 +1,13 @@
 Source: lensfun
 Priority: optional
 Maintainer: Debian KDE Extras Team <pkg-kde-extras@lists.alioth.debian.org>
-Uploaders: Mark Purcell <msp@debian.org>,
- Pino Toscano <pino@debian.org>
-Build-Depends: debhelper-compat (= 13), cmake, pkg-config, python3, libglib2.0-dev,
+Uploaders: Pino Toscano <pino@debian.org>
+Build-Depends: debhelper-compat (= 13), cmake (>= 2.8.12~), pkg-config, python3:any, libglib2.0-dev,
  dh-python,
  doxygen,
  python3-docutils,
-Standards-Version: 4.5.1
+ python3-setuptools,
+Standards-Version: 4.6.2
 Section: libs
 Rules-Requires-Root: no
 Homepage: https://lensfun.github.io/

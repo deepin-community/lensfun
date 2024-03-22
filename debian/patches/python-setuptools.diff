@@ -1,0 +1,17 @@
+Author: Pino Toscano <pino@debian.org>
+Description: Fix the installation of the Python module
+ - move the installation root ($DESTDIR) as --root parameter
+ - specify --single-version-externally-managed, so the module is not installed
+   as single egg file
+Forwarded: not-needed
+Last-Update: 2023-07-23
+
+--- a/apps/CMakeLists.txt
++++ b/apps/CMakeLists.txt
+@@ -42,5 +42,5 @@ IF(PYTHON)
+     IF(NOT DEFINED SETUP_PY_INSTALL_PREFIX)
+       SET(SETUP_PY_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
+     ENDIF()
+-    INSTALL(CODE "execute_process(COMMAND ${PYTHON} ${SETUP_PY} install --prefix=\$ENV{DESTDIR}${SETUP_PY_INSTALL_PREFIX})")
++    INSTALL(CODE "execute_process(COMMAND ${PYTHON} ${SETUP_PY} install --prefix=${SETUP_PY_INSTALL_PREFIX} --single-version-externally-managed --root=\$ENV{DESTDIR})")
+ ENDIF(PYTHON)

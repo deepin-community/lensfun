@@ -31,7 +31,6 @@ void mod_setup(lfFixture *lfFix, gconstpointer data)
 
 void mod_teardown(lfFixture *lfFix, gconstpointer data)
 {
-    lfFix->mod->Destroy();
     delete lfFix->lens;
 }
 
@@ -55,7 +54,7 @@ void test_mod_projection_center(lfFixture* lfFix, gconstpointer data)
             if(g_test_verbose())
                 g_print("  ~ Conversion from %s -> %s \n", geom_names[j], geom_names[i]);
 
-            lfFix->mod = lfModifier::Create (lfFix->lens, 1.0f, lfFix->img_width, lfFix->img_height);
+            lfFix->mod = new lfModifier (lfFix->lens, 1.0f, lfFix->img_width, lfFix->img_height);
             lfFix->mod->Initialize (
                 lfFix->lens, LF_PF_U8, 12.0f,
                 6.7f, 2.0f, 1.0f, geom_types[i],
@@ -68,6 +67,8 @@ void test_mod_projection_center(lfFixture* lfFix, gconstpointer data)
                 g_assert_cmpfloat(in[0],==,res[0]);
                 g_assert_cmpfloat(in[1],==,res[1]);
             }
+
+            delete lfFix->mod;
             i++;
         }
         j++;
@@ -77,8 +78,8 @@ void test_mod_projection_center(lfFixture* lfFix, gconstpointer data)
 // check if output becomes NaN when processing geometry conversion
 void test_mod_projection_borders(lfFixture* lfFix, gconstpointer data)
 {
-    float in[2]  = {lfFix->img_width, lfFix->img_height};
-    float in2[2] = {(lfFix->img_width-1)/2, (lfFix->img_height-1)/2};
+    float in[2]  = {(float) lfFix->img_width, (float) lfFix->img_height};
+    float in2[2] = {(float) (lfFix->img_width-1)/2, (float) (lfFix->img_height-1)/2};
     float res[2] = {0, 0};
 
     lfLensType geom_types [] = {LF_RECTILINEAR, LF_PANORAMIC, LF_EQUIRECTANGULAR, LF_FISHEYE_STEREOGRAPHIC, LF_FISHEYE, LF_FISHEYE_EQUISOLID, LF_FISHEYE_ORTHOGRAPHIC, LF_FISHEYE_THOBY, LF_UNKNOWN};
@@ -94,27 +95,28 @@ void test_mod_projection_borders(lfFixture* lfFix, gconstpointer data)
             if(g_test_verbose())
                 g_print("  ~ Conversion from %s -> %s \n", geom_names[j], geom_names[i]);
 
-            lfFix->mod = lfModifier::Create (lfFix->lens, 1.0f, lfFix->img_width, lfFix->img_height);
+            lfFix->mod = new lfModifier (lfFix->lens, 1.0f, lfFix->img_width, lfFix->img_height);
             lfFix->mod->Initialize (
                 lfFix->lens, LF_PF_U8, 12.0f,
                 6.7f, 2.0f, 1.0f, geom_types[i],
                 LF_MODIFY_GEOMETRY, false);
 
             if (lfFix->mod->ApplyGeometryDistortion(0,0,1,1,res)) {
-                g_assert_false(isnan(res[0]));
-                g_assert_false(isnan(res[1]));
+                g_assert_false(std::isnan(res[0]));
+                g_assert_false(std::isnan(res[1]));
             }
 
             if (lfFix->mod->ApplyGeometryDistortion(in[0],in[1],1,1,res)) {
-                g_assert_false(isnan(res[0]));
-                g_assert_false(isnan(res[1]));
+                g_assert_false(std::isnan(res[0]));
+                g_assert_false(std::isnan(res[1]));
             }
 
             if (lfFix->mod->ApplyGeometryDistortion(in2[0],in2[1],1,1,res)) {
-                g_assert_false(isnan(res[0]));
-                g_assert_false(isnan(res[1]));
+                g_assert_false(std::isnan(res[0]));
+                g_assert_false(std::isnan(res[1]));
             }
 
+            delete lfFix->mod;
             i++;
         }
         j++;
